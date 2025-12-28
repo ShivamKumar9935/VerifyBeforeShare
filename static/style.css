@@ -1,0 +1,219 @@
+:root {
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    
+    /* Credibility Colors */
+    --high-color: #10b981;
+    --medium-color: #f59e0b;
+    --low-color: #ef4444;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-gradient);
+    color: var(--text-main);
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 650px;
+    background: var(--card-bg);
+    padding: 48px;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+/* Header Enhancement */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    background: linear-gradient(to right, #1e293b, #4f46e5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.tagline {
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 16px;
+}
+
+/* Form Design */
+.input-box {
+    margin-bottom: 0;
+}
+
+textarea {
+    width: 100%;
+    height: 160px;
+    padding: 18px;
+    font-size: 16px;
+    line-height: 1.5;
+    border-radius: 16px;
+    border: 2px solid #e2e8f0;
+    background: #ffffff;
+    transition: all 0.2s ease;
+    resize: none;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+button {
+    width: 100%;
+    margin-top: 20px;
+    background: var(--primary);
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+button:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+/* Result Card */
+.result {
+    margin-top: 40px;
+    padding: 30px;
+    border-radius: 20px;
+    animation: slideUp 0.4s ease-out;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result h2 {
+    margin-top: 0;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.score-bar-container {
+    background: #e2e8f0;
+    height: 8px;
+    border-radius: 4px;
+    margin: 15px 0 25px 0;
+    overflow: hidden;
+}
+
+/* The Animation Definition */
+/* 1. Define the animation */
+@keyframes fillProgress {
+    from { width: 0%; }
+    to { width: var(--final-width); }
+}
+
+/* 2. Update the fill bar class */
+.score-bar-fill {
+    height: 100%;
+    /* This variable is passed from your HTML style attribute */
+    width: var(--final-width); 
+    border-radius: 4px;
+    
+    /* This ensures the animation runs on load */
+    animation: fillProgress 1.5s ease-out forwards;
+}
+
+/* 3. Ensure the container has a height so it's visible */
+.score-bar-container {
+    background: #e2e8f0;
+    height: 12px; /* Increased height for better visibility */
+    border-radius: 6px;
+    margin: 15px 0 25px 0;
+    overflow: hidden;
+    width: 100%;
+}
+
+/* Logic Colors (Keep these from before) */
+.high-credibility .score-bar-fill { background: var(--high-color); }
+.medium-credibility .score-bar-fill { background: var(--medium-color); }
+.low-credibility .score-bar-fill { background: var(--low-color); }
+
+/* Logic Colors */
+.high-credibility { background: #f0fdf4; border-top: 5px solid var(--high-color); }
+.high-credibility .score-bar-fill { background: var(--high-color); }
+
+.medium-credibility { background: #fffbeb; border-top: 5px solid var(--medium-color); }
+.medium-credibility .score-bar-fill { background: var(--medium-color); }
+
+.low-credibility { background: #fef2f2; border-top: 5px solid var(--low-color); }
+.low-credibility .score-bar-fill { background: var(--low-color); }
+
+.reasons-list {
+    list-style: none;
+    padding: 0;
+}
+
+.reasons-list li {
+    padding-left: 24px;
+    position: relative;
+    margin-bottom: 12px;
+    color: #475569;
+    font-size: 15px;
+}
+
+.reasons-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+    color: var(--primary);
+}
+.score-text {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+#score-number {
+    display: inline-block;
+    min-width: 1.5ch; /* Prevents text jumping as numbers change */
+    font-variant-numeric: tabular-nums; /* Keeps numbers perfectly aligned */
+    font-weight: 800;
+    font-size: 22px;
+}
