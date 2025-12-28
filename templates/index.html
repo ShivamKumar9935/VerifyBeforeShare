@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerifyBeforeShare | Analyze Misinformation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        <h1>VerifyBeforeShare</h1>
+        <p class="tagline">Combat misinformation with AI-powered analysis</p>
+    </div>
+
+    <div class="input-box">
+        <form method="POST">
+            <textarea name="content" placeholder="Paste a news headline, article snippet, or link here..." required></textarea>
+            <button type="submit">Analyze Content</button>
+        </form>
+    </div>
+
+    {% if result %}
+    <div class="result {{ result.level | lower | replace(' ', '-') }}">
+        <h2>
+            {% if result.level == "High Credibility" %} ✅ 
+            {% elif result.level == "Medium Credibility" %} ⚠️ 
+            {% else %} ❌ {% endif %}
+            {{ result.level }}
+        </h2>
+<div class="score-info">
+    <span class="score-text">
+        Trust Score: <strong id="score-number" data-target="{{ result.score }}">0</strong>%
+    </span>
+    
+    <div class="score-bar-container">
+        <div class="score-bar-fill" style="--final-width: {{ result.score }}% ;"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const scoreElement = document.getElementById('score-number');
+    const target = parseInt(scoreElement.getAttribute('data-target'));
+    let count = 0;
+    const duration = 1500; // Matches your CSS bar animation (1.5s)
+    const increment = target / (duration / 16); // 16ms is roughly 60fps
+
+    const updateCount = () => {
+        count += increment;
+        if (count < target) {
+            scoreElement.innerText = Math.floor(count);
+            requestAnimationFrame(updateCount);
+        } else {
+            scoreElement.innerText = target;
+        }
+    };
+
+    // Start the animation
+    updateCount();
+});
+</script>
+
+        <h3>Key Observations</h3>
+        <ul class="reasons-list">
+            {% for reason in result.reasons %}
+            <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
+        
+        <div class="warning">
+            {% if result.level == "High Credibility" %}
+                Content appears reliable, but always check original sources.
+            {% elif result.level == "Medium Credibility" %}
+                Multiple red flags detected. Cross-reference with major news outlets.
+            {% else %}
+                High probability of misinformation. Verify with fact-checking sites like Snopes or Reuters.
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>
