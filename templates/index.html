@@ -11,8 +11,7 @@
 
 <div class="container">
     <div class="header">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="VerifyBeforeShare Logo">
-
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
         <h1>VerifyBeforeShare</h1>
         <p class="tagline">Combat misinformation with AI-powered analysis</p>
     </div>
@@ -32,6 +31,15 @@
             {% else %} ❌ {% endif %}
             {{ result.level }}
         </h2>
+        <form method="POST" action="/report">
+    <input type="hidden" name="content" value="{{ request.form.content }}">
+    <input type="hidden" name="score" value="{{ result.score }}">
+    <input type="hidden" name="level" value="{{ result.level }}">
+    <button class="report-btn" type="submit">
+        🚩 Report Incorrect Result
+    </button>
+</form>
+
 <div class="score-info">
     <span class="score-text">
         Trust Score: <strong id="score-number" data-target="{{ result.score }}">0</strong>%
