@@ -8,6 +8,11 @@ RELIABLE_SOURCES = [
 
 ]
 
+# Known Unreliable
+UNRELIABLE_SOURCES = [
+    "fake-news.com", "clickbait.com", "unreliablesite.org","babylonbee.com"
+]
+
 # Emotional / panic keywords
 EMOTIONAL_KEYWORDS = [
     "urgent", "breaking", "shocking", "alert",
@@ -36,6 +41,11 @@ def evaluate_content(text: str) -> dict:
     if any(word in text_lower for word in EMOTIONAL_KEYWORDS):
         score -= 20
         reasons.append("Emotional or panic-inducing language detected")
+
+    # 2️⃣ Source Unreliability Check
+    if any(word in text_lower for word in UNRELIABLE_SOURCES):
+        score -= 100
+        reasons.append("Unreliable source detected Totally fake")
 
     # 3️⃣ Sensational Formatting Check
     if re.search(r"[A-Z]{4,}", text) or "!!!" in text:
