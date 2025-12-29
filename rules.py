@@ -14,6 +14,26 @@ app = Flask(__name__)
 # =========================
 # Website Route
 # =========================
+def ai_credibility_check(text):
+    if not OPENAI_ENABLED:
+        return "AI Disabled", 50, "AI verification not available"
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "Classify the news credibility."},
+                {"role": "user", "content": text}
+            ]
+        )
+        reply = response.choices[0].message.content
+        return "AI Verified", 70, reply
+
+    except Exception as e:
+        return "AI Error", 50, str(e)
+
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
@@ -65,3 +85,4 @@ def report_issue():
 # =========================
 if __name__ == "__main__":
     app.run(debug=True)
+
