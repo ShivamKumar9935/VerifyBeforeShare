@@ -1,41 +1,42 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from rules import evaluate_content
+from dotenv import load_dotenv
 
-# =========================
-# Create Flask App (ONCE)
+load_dotenv()
 # =========================
 app = Flask(__name__)
 CORS(app)
 
-# =========================
-# Website Route
+# ===== ====================
+# Websit    e Route
 # =========================
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
 
     if request.method == "POST":
-        content = request.form.get("content", "")
+        content = request.form.get("content")
+        use_ai = request.form.get("use_ai") == "true"
 
-        if content.strip():
-            result = evaluate_content(content)
+        if content and content.strip():
+            result = evaluate_content(content, use_ai=use_ai)
 
     return render_template("index.html", result=result)
 
+
 # =========================
-# API Route (Browser Extension)
+# API Route (for extension)
 # =========================
 @app.route("/api/check", methods=["POST"])
 def api_check():
-    data = request.get_json() or {}
+    data = request.get_json()
     content = data.get("content", "")
-    result = evaluate_content(content)
+    use_ai = data.get("use_ai", True)
+    result = evaluate_content(content, use_ai=use_ai)
     return jsonify(result)
 
-# =========================
-# Report Issue Route
-# =========================
+
 @app.route("/report", methods=["POST"])
 def report_issue():
     content = request.form.get("content")
@@ -43,7 +44,7 @@ def report_issue():
     level = request.form.get("level")
 
     with open("reports.log", "a") as f:
-        f.write("\nREPORTED ISSUE\n")
+        f.write(f"\nREPORTED ISSUE\n")
         f.write(f"Content: {content}\n")
         f.write(f"Score: {score}, Level: {level}\n")
         f.write("-" * 40 + "\n")
@@ -53,12 +54,10 @@ def report_issue():
         result={
             "score": score,
             "level": level,
-            "reasons": [
-                "Thank you for reporting.",
-                "This feedback will be reviewed to improve the system."
-            ]
+            "reasons": ["Thank you for reporting. This feedback helps improve the system."]
         }
     )
+
 
 # =========================
 # Run App
