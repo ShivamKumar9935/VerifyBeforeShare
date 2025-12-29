@@ -1,84 +1,67 @@
-import re
-
-# Known reliable sources (you can expand this list)
-RELIABLE_SOURCES = [
-    "gov.in", "who.int", "bbc.com", "reuters.com",
-    "ndtv.com", "timesofindia.com", "thehindu.com","timesofindia.indiatimes.com"
+from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
+from rules import evaluate_content
 
 
-]
-
-# Known Unreliable
-UNRELIABLE_SOURCES = [
-    "fake-news.com", "clickbait.com", "unreliablesite.org","babylonbee.com"
-]
-
-# Emotional / panic keywords
-EMOTIONAL_KEYWORDS = [
-    "urgent", "breaking", "shocking", "alert",
-    "panic", "danger", "warning", "forward",
-    "share immediately", "do not ignore"
-]
-
-# Time-sensitive keywords
-TIME_KEYWORDS = [
-    "just now", "right now", "today only",
-    "happening now", "at this moment"
-]
+app = Flask(__name__)
+CORS(app)
 
 
-def evaluate_content(text: str) -> dict:
-    score = 100
-    reasons = []
-    text_lower = text.lower()
 
-    # 1️⃣ Source Reliability Check
-    if not any(source in text_lower for source in RELIABLE_SOURCES):
-        score -= 25
-        reasons.append("Source is unverified or unknown")
+# ✅ Create Flask app FIRST
+app = Flask(__name__)
 
-    # 2️⃣ Emotional Language Check
-    if any(word in text_lower for word in EMOTIONAL_KEYWORDS):
-        score -= 20
-        reasons.append("Emotional or panic-inducing language detected")
+# =========================
+# Website Route
+# =========================
+@app.route("/", methods=["GET", "POST"])
+def index():
+    result = None
 
-    # 2️⃣ Source Unreliability Check
-    if any(word in text_lower for word in UNRELIABLE_SOURCES):
-        score -= 100
-        reasons.append("Unreliable source detected Totally fake")
+    if request.method == "POST":
+        content = request.form.get("content")
 
-    # 3️⃣ Sensational Formatting Check
-    if re.search(r"[A-Z]{4,}", text) or "!!!" in text:
-        score -= 10
-        reasons.append("Sensational formatting (CAPS or excessive punctuation)")
+        if content and content.strip():
+            result = evaluate_content(content)
 
-    # 4️⃣ Context & Reference Check
-    if "http" not in text_lower and "www" not in text_lower:
-        score -= 15
-        reasons.append("Lack of references or supporting links")
+    return render_template("index.html", result=result)
 
-    # 5️⃣ Time Sensitivity Check
-    if any(word in text_lower for word in TIME_KEYWORDS):
-        score -= 15
-        reasons.append("Highly time-sensitive wording detected")
 
-    # Keep score in valid range
-    score = max(score, 0)
+# =========================
+# API Route (for extension)
+# =========================
+@app.route("/api/check", methods=["POST"])
+def api_check():
+    data = request.get_json()
+    content = data.get("content", "")
+    result = evaluate_content(content)
+    return jsonify(result)
 
-    # Decide credibility level
-    if score >= 70:
-        level = "High Credibility"
-    elif score >= 40:
-        level = "Medium Credibility"
-    else:
-        level = "Low Credibility"
+@app.route("/report", methods=["POST"])
+def report_issue():
+    content = request.form.get("content")
+    score = request.form.get("score")
+    level = request.form.get("level")
 
-    # If nothing triggered, add positive message
-    if not reasons:
-        reasons.append("No major credibility risk signals detected")
+    with open("reports.log", "a") as f:
+        f.write(f"\nREPORTED ISSUE\n")
+        f.write(f"Content: {content}\n")
+        f.write(f"Score: {score}, Level: {level}\n")
+        f.write("-" * 40)
 
-    return {
-        "score": score,
-        "level": level,
-        "reasons": reasons
-    }
+    return render_template(
+        "index.html",
+        result={
+            "score": score,
+            "level": level,
+            "reasons": ["Thank you for reporting. This feedback helps improve the system."]
+        }
+    )
+
+
+
+# =========================
+# Run App
+# =========================
+if __name__ == "__main__":
+    app.run(debug=True)
